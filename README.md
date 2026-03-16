@@ -38,14 +38,3 @@ cd fake-job-detector
 pip install -r requirements.txt
 streamlit run app.py
 ```
-```
-
-Then push it:
-```
-git add README.md
-```
-```
-git commit -m "docs: add README"
-```
-```
-git push
