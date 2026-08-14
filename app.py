@@ -4,7 +4,6 @@ import re
 import nltk
 from nltk.corpus import stopwords
 import scipy.sparse as sp
-import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 
@@ -22,14 +21,9 @@ def load_models():
         numeric_features = pickle.load(f)
     return lr, rf, tfidf, numeric_features
 
-@st.cache_data
-def load_data():
-    return pd.read_csv('data/processed/model_data.csv')
-
 nltk.download('stopwords', quiet=True)
 stop_words = set(stopwords.words('english'))
 lr, rf, tfidf, NUMERIC_FEATURES = load_models()
-df = load_data()
 
 # Sidebar
 st.sidebar.title("Fake Job Detector")
@@ -42,7 +36,7 @@ if page == "Detector":
 
     col1, col2 = st.columns(2)
     with col1:
-        title = st.text_input("Job title", 
+        title = st.text_input("Job title",
                               placeholder="e.g. Software Engineer")
     with col2:
         employment_type = st.selectbox("Employment type",
@@ -91,7 +85,7 @@ if page == "Detector":
             else:
                 c1.success(f"Prediction: REAL JOB")
             c2.metric("Fraud probability", f"{avg_prob*100:.1f}%")
-            c3.metric("Confidence", 
+            c3.metric("Confidence",
                       "High" if abs(avg_prob-0.5)>0.3 else "Medium")
 
             fig = go.Figure(go.Indicator(
@@ -100,7 +94,7 @@ if page == "Detector":
                 title={'text': "Fraud probability (%)"},
                 gauge={
                     'axis': {'range': [0,100]},
-                    'bar': {'color': "crimson" if pred=="FAKE" 
+                    'bar': {'color': "crimson" if pred=="FAKE"
                             else "steelblue"},
                     'steps': [
                         {'range':[0,30],'color':'#EAF3DE'},
@@ -112,7 +106,7 @@ if page == "Detector":
             fig.update_layout(height=300)
             st.plotly_chart(fig, use_container_width=True)
 
-            suspicious_found = [w for w in 
+            suspicious_found = [w for w in
                 ['urgent','guaranteed','no experience',
                  'work from home','earn money','weekly pay',
                  'unlimited income','be your own boss']
@@ -142,10 +136,13 @@ else:
         st.plotly_chart(fig1, use_container_width=True)
 
     with col2:
-        emp_data = df.groupby('employment_type')['fraudulent']\
-            .mean().reset_index()
-        emp_data.columns = ['Employment type','Fraud rate']
-        emp_data = emp_data.sort_values('Fraud rate', ascending=False)
+        emp_fraud = {
+            'Employment type': ['Part-time','Other','Full-time',
+                                'Contract','Temporary'],
+            'Fraud rate': [0.093, 0.066, 0.042, 0.029, 0.009]
+        }
+        import pandas as pd
+        emp_data = pd.DataFrame(emp_fraud)
         fig2 = px.bar(emp_data, x='Employment type', y='Fraud rate',
                       title='Fraud rate by employment type',
                       color='Fraud rate',
