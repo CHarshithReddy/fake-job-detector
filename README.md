@@ -1,5 +1,8 @@
 # Fake Job Posting Detector
 
+## Live Demo
+[Live Demo](https://fake-job-detectr.streamlit.app/)
+
 A machine learning system that detects fraudulent job postings using NLP.
 
 ## What it does
